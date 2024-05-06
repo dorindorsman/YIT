@@ -23,12 +23,12 @@ class GalleryViewModel(
         const val TAG = "GalleryViewModel"
     }
 
-    var images: List<ImageEntity> by mutableStateOf(
+    var images by mutableStateOf<List<ImageEntity>>(
         emptyList()
     )
-    var searchText by mutableStateOf("")
-    var searchActive by mutableStateOf(false)
-    var history: List<String> by mutableStateOf(
+    var currentText by mutableStateOf("")
+    var currentActive by mutableStateOf(false)
+    var history by mutableStateOf<List<String>>(
         emptyList()
     )
 
@@ -83,16 +83,14 @@ class GalleryViewModel(
     }
 
     private fun setSearchActive(active: Boolean) {
-        searchActive = active
+        currentActive = active
     }
 
     private fun setSearchText(text: String) {
-        searchText = text
+        currentText = text
     }
 
     private fun addHistorySearch(text: String) {
         history.toMutableStateList().add(0,text)
     }
-
-
 }

@@ -10,7 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yit.data.models.Response
 import com.example.yit.data.repository.GalleryRepository
-import com.example.yit.domain.models.Image
+import com.example.yit.local.models.ImageEntity
+import com.example.yit_images.ImagesMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -22,14 +23,21 @@ class GalleryViewModel(
         const val TAG = "GalleryViewModel"
     }
 
-    var images: List<Image> by mutableStateOf(
+    var images: List<ImageEntity> by mutableStateOf(
+        emptyList()
+    )
+    var searchText by mutableStateOf("")
+    var searchActive by mutableStateOf(false)
+    var history: List<String> by mutableStateOf(
         emptyList()
     )
 
     fun handle(event: GalleryEvent) {
         Log.d(TAG, "$event")
         when (event) {
-            else -> {}
+            is GalleryEvent.SetSearchActive -> setSearchActive(event.active)
+            is GalleryEvent.SetSearchText -> setSearchText(event.text)
+            is GalleryEvent.AddHistorySearch -> addHistorySearch(event.text)
         }
     }
 
@@ -64,7 +72,7 @@ class GalleryViewModel(
         galleryRepository.getGallery().also { response ->
             if (response is Response.Success) {
                 Log.d(TAG, "${response.data}")
-                images = response.data.hits.toMutableStateList()
+                images = ImagesMapper.mapImageToImageEntity(response.data.hits.toMutableStateList())
                 Log.d(TAG, "${images}")
             } else if (response is Response.Error) {
                 response.apply {
@@ -73,4 +81,18 @@ class GalleryViewModel(
             }
         }
     }
+
+    private fun setSearchActive(active: Boolean) {
+        searchActive = active
+    }
+
+    private fun setSearchText(text: String) {
+        searchText = text
+    }
+
+    private fun addHistorySearch(text: String) {
+        history.toMutableStateList().add(0,text)
+    }
+
+
 }

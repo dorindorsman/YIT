@@ -70,4 +70,10 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+
+    //Extended Icons
+    implementation(libs.material.icons.extended)
+
+    //Coil
+    implementation(libs.coil.compose)
 }

@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object GalleryProvider {
 
     const val TAG = "GalleryProvider"
-    const val BASE_URL = "https://pixabay.com/api/?q=kittens&key=6814610-cd083c066ad38bb511337fb2b"
+    const val BASE_URL = "https://pixabay.com/api/"
 
     fun provide(): GalleryApi {
         Log.d(TAG, "provide")

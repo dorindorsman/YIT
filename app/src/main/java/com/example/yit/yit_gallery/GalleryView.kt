@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
@@ -22,17 +23,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import com.example.utils.observe
-import com.example.yit_images.GridImageView
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun GalleryView(
-    navigateToProduct: (id: Int) -> Unit,
+    navigateToImage: (id: Int) -> Unit,
     viewModel: GalleryViewModel
 ) {
 
@@ -40,39 +40,32 @@ fun GalleryView(
         viewModel.handle(it)
     }
 
-    Scaffold (
+    Scaffold(
         topBar = { SearchImageBar(Modifier.fillMaxWidth(), viewModel) }
-    ){
+    ) {
         Spacer(modifier = Modifier.height(30.dp))
-        GalleryGrid(Modifier.padding(it), viewModel)
+        GalleryGrid(Modifier.padding(it), viewModel, navigateToImage)
     }
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchImageBar(modifier: Modifier = Modifier, viewModel: GalleryViewModel){
+fun SearchImageBar(modifier: Modifier = Modifier, viewModel: GalleryViewModel) {
     SearchBar(
         modifier = modifier.fillMaxWidth(),
-        query = viewModel.currentText,
+        query = viewModel.currentQuery,
         onQueryChange = {
-            viewModel.handle(GalleryEvent.SetSearchText(it))
-            //text = it
+            viewModel.handle(GalleryEvent.SetSearchQuery(it))
         },
         onSearch = {
             viewModel.handle(GalleryEvent.SetSearchActive(false))
             viewModel.handle(GalleryEvent.AddHistorySearch(it))
-
-            //viewModel.handle(GalleryEvent.SetSearchText(""))
-            // active = false
-//                items.add(0,text)
-            //Fixme
-            //text = ""
+            viewModel.handle(GalleryEvent.SearchImages)
         },
         active = viewModel.currentActive,
         onActiveChange = {
             viewModel.handle(GalleryEvent.SetSearchActive(it))
-//                active = it
         },
         placeholder = {
             Text(text = "Search")
@@ -83,8 +76,8 @@ fun SearchImageBar(modifier: Modifier = Modifier, viewModel: GalleryViewModel){
         trailingIcon = {
             if (viewModel.currentActive) {
                 IconButton(onClick = {
-                    if (viewModel.currentText.isNotEmpty()) {
-                        viewModel.handle(GalleryEvent.SetSearchText(""))
+                    if (viewModel.currentQuery.isNotEmpty()) {
+                        viewModel.handle(GalleryEvent.SetSearchQuery(""))
                     } else {
                         viewModel.handle(GalleryEvent.SetSearchActive(false))
                     }
@@ -102,6 +95,7 @@ fun SearchImageBar(modifier: Modifier = Modifier, viewModel: GalleryViewModel){
 //                }
         }
     ) {
+        //fixme not all screen
         viewModel.history.forEach {
             Row(modifier = Modifier.padding(all = 14.dp)) {
                 Icon(modifier = Modifier.padding(end = 10.dp), imageVector = Icons.Default.History, contentDescription = "History Icon")
@@ -112,16 +106,24 @@ fun SearchImageBar(modifier: Modifier = Modifier, viewModel: GalleryViewModel){
 }
 
 @Composable
-fun GalleryGrid(modifier: Modifier = Modifier, viewModel: GalleryViewModel) {
+fun GalleryGrid(modifier: Modifier = Modifier, viewModel: GalleryViewModel, navigateToImage: (id: Int) -> Unit) {
+    val state = rememberLazyStaggeredGridState()
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Adaptive(minSize = 100.dp),
+        state = state,
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalItemSpacing = 8.dp
     ) {
-        items(viewModel.images){
-            GridImageView(it)
+        items(viewModel.searchImages) {
+            GridImageView(it, navigateToImage)
+        }
+    }
+
+    LaunchedEffect(key1 = state.canScrollForward) {
+        if (state.canScrollForward.not() && viewModel.currentQuery.isNotBlank()) {
+            viewModel.handle(GalleryEvent.LoadNextPage)
         }
     }
 }

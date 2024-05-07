@@ -1,8 +1,7 @@
-package com.example.yit_images
+package com.example.utils
 
 import android.util.Log
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.example.yit.domain.models.Image
 import com.example.yit.local.models.ImageEntity
 

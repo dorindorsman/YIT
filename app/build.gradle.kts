@@ -76,4 +76,8 @@ dependencies {
 
     //Coil
     implementation(libs.coil.compose)
+
+    //Animation
+    implementation(libs.androidx.compose.animation)
+
 }

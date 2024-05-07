@@ -41,7 +41,7 @@ class GalleryViewModel(
             is GalleryEvent.SetSearchActive -> setSearchActive(event.active)
             is GalleryEvent.SetSearchQuery -> setSearchQuery(event.query)
             is GalleryEvent.AddHistorySearch -> addHistorySearch(event.query)
-            GalleryEvent.SearchImages -> searchImages()
+            is GalleryEvent.SearchImages -> searchImages(event.query)
             GalleryEvent.LoadNextPage -> loadNextPage()
         }
     }
@@ -118,6 +118,7 @@ class GalleryViewModel(
         viewModelScope.launch {
             // Update search history
             val updatedHistory = history.toMutableList()
+            updatedHistory.remove(query)
             updatedHistory.add(0, query)
             history = updatedHistory
         }
@@ -125,9 +126,10 @@ class GalleryViewModel(
     }
 
     //fixme
-    private fun searchImages() {
-        Log.d(TAG, "searchImages for query:$currentQuery")
-        if (currentQuery.isBlank()) {
+    private fun searchImages(query: String) {
+        Log.d(TAG, "searchImages for query:$query")
+        setSearchQuery(query)
+        if (query.isBlank()) {
             return
         }
         currentPage = 1

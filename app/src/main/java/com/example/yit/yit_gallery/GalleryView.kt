@@ -1,6 +1,7 @@
 package com.example.yit.yit_gallery
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,10 +25,19 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleOwner
 import com.example.utils.observe
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -61,7 +71,7 @@ fun SearchImageBar(modifier: Modifier = Modifier, viewModel: GalleryViewModel) {
         onSearch = {
             viewModel.handle(GalleryEvent.SetSearchActive(false))
             viewModel.handle(GalleryEvent.AddHistorySearch(it))
-            viewModel.handle(GalleryEvent.SearchImages)
+            viewModel.handle(GalleryEvent.SearchImages(viewModel.currentQuery))
         },
         active = viewModel.currentActive,
         onActiveChange = {
@@ -97,7 +107,16 @@ fun SearchImageBar(modifier: Modifier = Modifier, viewModel: GalleryViewModel) {
     ) {
         //fixme not all screen
         viewModel.history.forEach {
-            Row(modifier = Modifier.padding(all = 14.dp)) {
+            Row(
+                modifier = Modifier
+                    .padding(all = 14.dp)
+                    .fillMaxWidth()
+                    .clickable {
+                        viewModel.handle(GalleryEvent.SearchImages(it))
+                        viewModel.handle(GalleryEvent.SetSearchActive(false))
+                        viewModel.handle(GalleryEvent.AddHistorySearch(it))
+                    }
+            ) {
                 Icon(modifier = Modifier.padding(end = 10.dp), imageVector = Icons.Default.History, contentDescription = "History Icon")
                 Text(text = it)
             }

@@ -10,7 +10,7 @@ class GalleryRepository (
     companion object {
         const val TAG = "GalleryRepository"
         private val KEY = "6814610-cd083c066ad38bb511337fb2b"
-        private val PER_PAGE = 30
+        private val PER_PAGE = 5 //fixme
     }
 
     suspend fun getGallery(query: String, page: Int): Response {

@@ -1,5 +1,6 @@
 package com.example.yit_image
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.yit.local.repository.SearchGalleryRepository
 
@@ -13,9 +14,10 @@ class ImageDisplayViewModel(
         const val TAG = "ImageDisplayViewModel"
     }
 
-    var searchResult = searchGalleryRepository.searchResult
+    var searchResultList = searchGalleryRepository.searchResult
 
     fun getInitialImageIndex() : Int {
+        Log.d(TAG, "getInitialImageIndex")
         val image = SearchGalleryRepository.searchResult.firstOrNull {
             it.id==imageId
         }

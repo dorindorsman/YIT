@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.utils.ImagesMapper
 import com.example.yit.data.models.Response
 import com.example.yit.data.repository.GalleryRepository
+import com.example.yit.local.repository.PreferencesManager
 import com.example.yit.local.repository.SearchGalleryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,19 +20,21 @@ import kotlinx.coroutines.launch
 class GalleryViewModel(
     private val galleryRepository: GalleryRepository,
     private val searchGalleryRepository: SearchGalleryRepository,
+    private val preferencesManager: PreferencesManager,
 ) : ViewModel() {
 
     companion object {
         const val TAG = "GalleryViewModel"
+        const val LAST_HISTORY_KEY = "last_history"
     }
 
     private var currentPage by mutableIntStateOf(1)
     var currentQuery by mutableStateOf("")
     var currentActive by mutableStateOf(false)
-    var history by mutableStateOf<List<String>>(
+    var historyList by mutableStateOf<List<String>>(
         emptyList()
     )
-    var searchImages by mutableStateOf(
+    var searchImagesList by mutableStateOf(
         searchGalleryRepository.searchResult
     )
 
@@ -56,17 +59,23 @@ class GalleryViewModel(
 
     private fun onStart() {
         Log.d(TAG, "onStart")
-        loadImagesList()
+        if (searchGalleryRepository.searchResult.isEmpty()) {
+            loadImagesList()
+        }
     }
 
-
-    //fixme
     private fun loadImagesList() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(TAG, "setImagesList")
-        if (searchGalleryRepository.searchResult.isEmpty()) {
-             //getRemoteImages()
+        val data = preferencesManager.loadData(LAST_HISTORY_KEY, "")
+        if (data == "") {
+            Log.d(TAG, "empty data")
         } else {
-//            getRemoteProducts()
+            historyList = listOf(data)
+            getRemoteImages(
+                query = historyList[0],
+                page = currentPage,
+            )
+            currentQuery = historyList[0]
         }
     }
 
@@ -84,15 +93,15 @@ class GalleryViewModel(
             if (response is Response.Success) {
                 Log.d(TAG, "${response.data}")
                 val result = ImagesMapper.mapImageToImageEntity(response.data.hits.toMutableStateList())
-                Log.d(TAG, "${searchImages}")
+                Log.d(TAG, "${searchImagesList}")
                 if (resetList) {
                     searchGalleryRepository.searchResult = result
-                    searchImages = result
+                    searchImagesList = result
                 } else {
                     val updatedList = searchGalleryRepository.searchResult.toMutableList()
                     updatedList.addAll(result)
                     searchGalleryRepository.searchResult = updatedList
-                    searchImages = updatedList
+                    searchImagesList = updatedList
                 }
             } else if (response is Response.Error) {
                 response.apply {
@@ -114,18 +123,18 @@ class GalleryViewModel(
 
     private fun addHistorySearch(query: String) {
         Log.d(TAG, "addHistorySearch $query")
-        history.toMutableList().add(0, query)
+        historyList.toMutableList().add(0, query)
         viewModelScope.launch {
             // Update search history
-            val updatedHistory = history.toMutableList()
+            val updatedHistory = historyList.toMutableList()
             updatedHistory.remove(query)
             updatedHistory.add(0, query)
-            history = updatedHistory
+            historyList = updatedHistory
+            preferencesManager.saveData(LAST_HISTORY_KEY, historyList[0])
         }
-        Log.d(TAG, "HistorySearch: ${history}")
+        Log.d(TAG, "HistorySearch: ${historyList}")
     }
 
-    //fixme
     private fun searchImages(query: String) {
         Log.d(TAG, "searchImages for query:$query")
         setSearchQuery(query)
@@ -142,5 +151,4 @@ class GalleryViewModel(
         currentPage++
         getRemoteImages(currentQuery, currentPage, false)
     }
-
 }

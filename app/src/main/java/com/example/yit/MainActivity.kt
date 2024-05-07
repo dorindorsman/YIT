@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.yit.local.repository.PreferencesManager
 import com.example.yit.ui.theme.YitTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,10 +21,12 @@ class MainActivity : ComponentActivity() {
             YitTheme {
                 // A surface container using the 'background' color from the theme
                 val navController = rememberNavController()
+                val preferencesManager = remember { PreferencesManager(applicationContext) }
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     MainNavigation(
                         modifier = Modifier,
                         navController = navController,
+                        preferencesManager = preferencesManager
                     )
                 }
             }

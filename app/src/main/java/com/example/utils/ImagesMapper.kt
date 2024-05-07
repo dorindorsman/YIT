@@ -6,22 +6,8 @@ import com.example.yit.domain.models.Image
 import com.example.yit.local.models.ImageEntity
 
 object ImagesMapper {
-    //fixme
 
     private const val TAG = "ImagesMapper"
-
-    fun mapImageEntityToProduct(imagesEntityList: List<ImageEntity>): List<Image> {
-        Log.d(TAG, "mapProductEntityToProduct")
-        return imagesEntityList.map { entity ->
-            refactorImageEntityToImage(entity)
-        }
-    }
-
-    private fun refactorImageEntityToImage(entity: ImageEntity): Image {
-        return Image(
-
-        )
-    }
 
     fun mapImageToImageEntity(imagesList: List<Image>): List<ImageEntity> {
         Log.d(TAG, "mapProductToProductEntity")
@@ -57,5 +43,4 @@ object ImagesMapper {
             userImageURL = image.userImageURL
         )
     }
-
 }

@@ -80,4 +80,7 @@ dependencies {
     //Animation
     implementation(libs.androidx.compose.animation)
 
+    //SharedPreferences
+    implementation(libs.androidx.datastore.preferences)
+
 }

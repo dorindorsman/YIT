@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.yit.MainPage.GALLERY
 import com.example.yit.MainPage.IMAGE
+import com.example.yit.local.repository.PreferencesManager
 import com.example.yit.yit_gallery.GalleryView
 import com.example.yit.yit_gallery.GalleryViewModelFactory
 import com.example.yit_image.ImageDisplayView
@@ -24,7 +25,8 @@ object MainPage {
 @Composable
 fun MainNavigation(
     navController: NavHostController,
-    modifier: Modifier
+    modifier: Modifier,
+    preferencesManager: PreferencesManager
 ) {
     val appContext = LocalContext.current.applicationContext
     NavHost(navController, startDestination = GALLERY, modifier = modifier) {
@@ -34,7 +36,7 @@ fun MainNavigation(
                     navController.navigate(route = "$IMAGE/$id")
                 },
                 viewModel(
-                    factory = GalleryViewModelFactory(appContext)
+                    factory = GalleryViewModelFactory(preferencesManager)
                 )
             )
         }
@@ -50,7 +52,7 @@ fun MainNavigation(
 
             ImageDisplayView(
                 viewModel (
-                    factory = ImageDisplayViewModelFactory(appContext, imageId)
+                    factory = ImageDisplayViewModelFactory(imageId)
                 )
             )
         }

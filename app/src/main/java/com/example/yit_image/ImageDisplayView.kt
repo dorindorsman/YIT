@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -37,7 +38,7 @@ fun ImageDisplayView(imageDisplayViewModel: ImageDisplayViewModel) {
     } else {
         val pagerState = rememberPagerState(
             initialPage = initialPage,
-            pageCount = { imageDisplayViewModel.searchResult.size }
+            pageCount = { imageDisplayViewModel.searchResultList.size }
         )
         val scope = rememberCoroutineScope()
         Box(modifier = Modifier.fillMaxSize()) {
@@ -49,7 +50,7 @@ fun ImageDisplayView(imageDisplayViewModel: ImageDisplayViewModel) {
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(10.dp)),
-                    painter = rememberAsyncImagePainter(imageDisplayViewModel.searchResult[index].largeImageURL),
+                    painter = rememberAsyncImagePainter(imageDisplayViewModel.searchResultList[index].largeImageURL),
                     contentDescription = null,
                     contentScale = ContentScale.Fit
                 )
@@ -100,6 +101,10 @@ fun ImageDisplayView(imageDisplayViewModel: ImageDisplayViewModel) {
 
 @Composable
 fun EmptyView() {
-    //fixme
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = "No Data To Show",
+        )
+    }
 }
 

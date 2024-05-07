@@ -25,19 +25,10 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
 import com.example.utils.observe
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -45,7 +36,6 @@ fun GalleryView(
     navigateToImage: (id: Int) -> Unit,
     viewModel: GalleryViewModel
 ) {
-
     LocalLifecycleOwner.current.lifecycle.observe {
         viewModel.handle(it)
     }
@@ -56,7 +46,6 @@ fun GalleryView(
         Spacer(modifier = Modifier.height(30.dp))
         GalleryGrid(Modifier.padding(it), viewModel, navigateToImage)
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,18 +84,9 @@ fun SearchImageBar(modifier: Modifier = Modifier, viewModel: GalleryViewModel) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "Close Icon")
                 }
             }
-//FIXME
-//                Row {
-//
-//                    Spacer(modifier = Modifier.width(Icons.Default.Close.defaultWidth.times(0.5f)))
-//                    IconButton(onClick = { /*TODO*/ }) {
-//                        Text(text = "GO")
-//                    }
-//                }
         }
     ) {
-        //fixme not all screen
-        viewModel.history.forEach {
+        viewModel.historyList.forEach {
             Row(
                 modifier = Modifier
                     .padding(all = 14.dp)
@@ -135,7 +115,7 @@ fun GalleryGrid(modifier: Modifier = Modifier, viewModel: GalleryViewModel, navi
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalItemSpacing = 8.dp
     ) {
-        items(viewModel.searchImages) {
+        items(viewModel.searchImagesList) {
             GridImageView(it, navigateToImage)
         }
     }
